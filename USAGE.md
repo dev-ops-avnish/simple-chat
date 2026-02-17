@@ -1,5 +1,24 @@
 # Simple Chat - Usage Guide
 
+## Installation
+
+### Prerequisites
+
+- Rust 1.70 or later
+- Cargo (comes with Rust)
+
+Install Rust from: https://rustup.rs/
+
+### Installing Pre-commit Hook (Optional)
+
+To automatically check formatting, compilation, and linting before each commit:
+
+```bash
+# Copy the pre-commit hook
+cp pre-commit.sh .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
 ## Building the Project
 
 ```bash
