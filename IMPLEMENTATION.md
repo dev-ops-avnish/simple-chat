@@ -4,6 +4,10 @@
 
 This project implements a simple asynchronous chat server and CLI client in Rust, meeting all requirements specified in the README.md.
 
+## Development Approach
+
+This implementation was completed using **Agenticide**, my own agentic IDE implementation (similar to Cursor). I took this opportunity to demonstrate how modern AI-assisted development tools can be leveraged to efficiently complete complex software engineering tasks. Agenticide provided intelligent code generation, architectural guidance, and automated testing workflows throughout the development process.
+
 ## Implementation Details
 
 ### Architecture
