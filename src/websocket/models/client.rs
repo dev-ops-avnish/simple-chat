@@ -1,29 +1,17 @@
 // WebSocket client model
-// Generated stub for websocket
 
-use use serde::{Deserialize, Serialize};
-use use chrono::Utc;
+use crate::websocket::models::message::Message;
+use tokio::sync::mpsc;
 
-/// WebSocket client structure
+/// Represents a connected client
+#[allow(dead_code)]
 pub struct Client {
-    pub pub id: String,
-    pub pub name: String,
-    pub pub connection_ids: Vec<String>,
-    pub pub created_at: i64,
-    pub pub metadata: Option<serde_json::Value>,
+    pub username: String,
+    pub sender: mpsc::UnboundedSender<Message>,
 }
 
-/// Create new client
-pub fn new(id: String, name: String) -> Self {
-    unimplemented!("new")
-}
-
-/// Add connection ID to client
-pub fn add_connection(&mut self, connection_id: String) {
-    unimplemented!("add_connection")
-}
-
-/// Remove connection ID from client
-pub fn remove_connection(&mut self, connection_id: &str) {
-    unimplemented!("remove_connection")
+impl Client {
+    pub fn new(username: String, sender: mpsc::UnboundedSender<Message>) -> Self {
+        Self { username, sender }
+    }
 }

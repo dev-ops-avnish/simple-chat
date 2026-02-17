@@ -1,23 +1,24 @@
 // Configuration structure for WebSocket service
-// Generated stub for websocket
 
-use use serde::{Deserialize, Serialize};
-
-/// WebSocket service configuration
+/// Server configuration
+#[derive(Clone)]
 pub struct Config {
-    pub pub host: String,
-    pub pub port: u16,
-    pub pub max_connections: usize,
-    pub pub heartbeat_interval: u64,
-    pub pub client_timeout: u64,
+    pub host: String,
+    pub port: u16,
 }
 
-/// Create new configuration
-pub fn new(host: String, port: u16, max_connections: usize) -> Self {
-    unimplemented!("new")
+impl Config {
+    #[allow(dead_code)]
+    pub fn new(host: String, port: u16) -> Self {
+        Self { host, port }
+    }
 }
 
-/// Default configuration values
 impl Default for Config {
-    unimplemented!("default")
+    fn default() -> Self {
+        Self {
+            host: "127.0.0.1".to_string(),
+            port: 8080,
+        }
+    }
 }

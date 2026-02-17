@@ -1,40 +1,29 @@
 // WebSocket message model
-// Generated stub for websocket
 
-use use serde::{Deserialize, Serialize};
-use use crate::error::Result;
-use use chrono::Utc;
+use serde::{Deserialize, Serialize};
 
-/// WebSocket message structure
-pub struct Message {
-    pub pub id: String,
-    pub pub client_id: String,
-    pub pub content: String,
-    pub pub message_type: MessageType,
-    pub pub timestamp: i64,
-    pub pub metadata: Option<serde_json::Value>,
+/// Message types for the chat protocol
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", content = "data")]
+pub enum Message {
+    /// Join the chat room with a username
+    Join { username: String },
+    /// Leave the chat room
+    Leave,
+    /// Send a message to all users in the room
+    Send { content: String },
+    /// Broadcast message from server to clients
+    Broadcast { username: String, content: String },
+    /// Error message from server
+    Error { message: String },
 }
 
-/// Message type enum
-pub struct MessageType {
-    pub Text,
-    pub Binary,
-    pub Ping,
-    pub Pong,
-    pub Close,
-}
+impl Message {
+    pub fn to_json(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(self)
+    }
 
-/// Create new message
-pub fn new(id: String, client_id: String, content: String, message_type: MessageType) -> Self {
-    unimplemented!("new")
-}
-
-/// Serialize message to JSON
-pub fn to_json(&self) -> Result<String> {
-    unimplemented!("to_json")
-}
-
-/// Deserialize message from JSON
-pub fn from_json(json: &str) -> Result<Self> {
-    unimplemented!("from_json")
+    pub fn from_json(s: &str) -> Result<Self, serde_json::Error> {
+        serde_json::from_str(s)
+    }
 }

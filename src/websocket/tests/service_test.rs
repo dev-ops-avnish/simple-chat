@@ -1,67 +1,38 @@
 // Service layer unit tests
-// Generated stub for websocket
 
-use use std::sync::Arc;
-use use std::collections::HashMap;
-use use tokio::sync::Mutex;
-use use crate::service::WebSocketService;
-use use crate::repository::WebSocketRepository;
-use use crate::models::*;
-use use crate::config::Config;
+#[cfg(test)]
+mod tests {
+    use crate::websocket::models::client::Client;
+    use crate::websocket::repository::ChatRepository;
+    use crate::websocket::service::ChatService;
+    use tokio::sync::mpsc;
 
-/// Mock repository for testing
-pub struct MockRepository {
-    pub clients: Arc<Mutex<HashMap<String, Client>>>,
-    pub connections: Arc<Mutex<HashMap<String, Connection>>>,
-    pub messages: Arc<Mutex<Vec<Message>>>,
-}
+    #[tokio::test]
+    async fn test_handle_join() {
+        let repo = ChatRepository::new();
+        let service = ChatService::new(repo);
+        let (tx, _rx) = mpsc::unbounded_channel();
+        let client = Client::new("user1".to_string(), tx);
 
-/// Test client creation
-#[tokio::test] async fn test_create_client() {
-    unimplemented!("test_create_client")
-}
+        assert!(service
+            .handle_join("user1".to_string(), client)
+            .await
+            .is_ok());
+    }
 
-/// Test retrieving client
-#[tokio::test] async fn test_get_client() {
-    unimplemented!("test_get_client")
-}
+    #[tokio::test]
+    async fn test_handle_leave() {
+        let repo = ChatRepository::new();
+        let service = ChatService::new(repo.clone());
+        let (tx, _rx) = mpsc::unbounded_channel();
+        let client = Client::new("user1".to_string(), tx);
 
-/// Test updating client
-#[tokio::test] async fn test_update_client() {
-    unimplemented!("test_update_client")
-}
+        service
+            .handle_join("user1".to_string(), client)
+            .await
+            .unwrap();
+        service.handle_leave("user1").await;
 
-/// Test deleting client
-#[tokio::test] async fn test_delete_client() {
-    unimplemented!("test_delete_client")
-}
-
-/// Test listing clients with pagination
-#[tokio::test] async fn test_list_clients() {
-    unimplemented!("test_list_clients")
-}
-
-/// Test connection creation
-#[tokio::test] async fn test_create_connection() {
-    unimplemented!("test_create_connection")
-}
-
-/// Test closing connection
-#[tokio::test] async fn test_close_connection() {
-    unimplemented!("test_close_connection")
-}
-
-/// Test message handling
-#[tokio::test] async fn test_handle_message() {
-    unimplemented!("test_handle_message")
-}
-
-/// Test message broadcasting
-#[tokio::test] async fn test_broadcast_message() {
-    unimplemented!("test_broadcast_message")
-}
-
-/// Test stale connection cleanup
-#[tokio::test] async fn test_cleanup_stale_connections() {
-    unimplemented!("test_cleanup_stale_connections")
+        assert_eq!(repo.client_count().await, 0);
+    }
 }

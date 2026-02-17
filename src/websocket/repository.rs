@@ -1,70 +1,61 @@
-// Repository trait interface for data persistence
-// Generated stub for websocket
+// Repository for managing connected clients
 
-use use async_trait::async_trait;
-use use crate::models::{Client, Connection, Message};
-use use crate::error::Result;
+use crate::websocket::error::{Result, WebSocketError};
+use crate::websocket::models::client::Client;
+use crate::websocket::models::message::Message;
+use std::collections::HashMap;
+use std::sync::Arc;
+use tokio::sync::RwLock;
 
-/// Repository trait for WebSocket data operations
-pub struct WebSocketRepository {
+/// Repository for managing chat room state
+#[derive(Clone)]
+pub struct ChatRepository {
+    clients: Arc<RwLock<HashMap<String, Client>>>,
 }
 
-/// Create a new client
-async fn create_client(&self, client: Client) -> Result<Client> {
-    unimplemented!("create_client")
+impl ChatRepository {
+    pub fn new() -> Self {
+        Self {
+            clients: Arc::new(RwLock::new(HashMap::new())),
+        }
+    }
+
+    /// Add a new client to the repository
+    pub async fn add_client(&self, username: String, client: Client) -> Result<()> {
+        let mut clients = self.clients.write().await;
+        if clients.contains_key(&username) {
+            return Err(WebSocketError::UsernameExists(username));
+        }
+        clients.insert(username, client);
+        Ok(())
+    }
+
+    /// Remove a client from the repository
+    pub async fn remove_client(&self, username: &str) {
+        let mut clients = self.clients.write().await;
+        clients.remove(username);
+    }
+
+    /// Broadcast a message to all clients except the sender
+    pub async fn broadcast(&self, sender_username: &str, message: Message) {
+        let clients = self.clients.read().await;
+        for (username, client) in clients.iter() {
+            if username != sender_username {
+                let _ = client.sender.send(message.clone());
+            }
+        }
+    }
+
+    /// Get the count of connected clients
+    #[allow(dead_code)]
+    pub async fn client_count(&self) -> usize {
+        let clients = self.clients.read().await;
+        clients.len()
+    }
 }
 
-/// Get client by ID
-async fn get_client(&self, id: &str) -> Result<Client> {
-    unimplemented!("get_client")
-}
-
-/// Update existing client
-async fn update_client(&self, id: &str, client: Client) -> Result<Client> {
-    unimplemented!("update_client")
-}
-
-/// Delete client by ID
-async fn delete_client(&self, id: &str) -> Result<()> {
-    unimplemented!("delete_client")
-}
-
-/// List all clients with pagination
-async fn list_clients(&self, limit: Option<usize>, offset: Option<usize>) -> Result<Vec<Client>> {
-    unimplemented!("list_clients")
-}
-
-/// Create a new connection
-async fn create_connection(&self, connection: Connection) -> Result<Connection> {
-    unimplemented!("create_connection")
-}
-
-/// Get connection by ID
-async fn get_connection(&self, id: &str) -> Result<Connection> {
-    unimplemented!("get_connection")
-}
-
-/// Update existing connection
-async fn update_connection(&self, id: &str, connection: Connection) -> Result<Connection> {
-    unimplemented!("update_connection")
-}
-
-/// Delete connection by ID
-async fn delete_connection(&self, id: &str) -> Result<()> {
-    unimplemented!("delete_connection")
-}
-
-/// List connections optionally filtered by client ID
-async fn list_connections(&self, client_id: Option<&str>) -> Result<Vec<Connection>> {
-    unimplemented!("list_connections")
-}
-
-/// Save a message
-async fn save_message(&self, message: Message) -> Result<Message> {
-    unimplemented!("save_message")
-}
-
-/// Get messages for a client
-async fn get_messages(&self, client_id: &str, limit: Option<usize>) -> Result<Vec<Message>> {
-    unimplemented!("get_messages")
+impl Default for ChatRepository {
+    fn default() -> Self {
+        Self::new()
+    }
 }

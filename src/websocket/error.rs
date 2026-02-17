@@ -1,16 +1,24 @@
 // Custom error types for WebSocket service
-// Generated stub for websocket
 
-use use thiserror::Error;
-use use std::fmt;
+use thiserror::Error;
 
 /// WebSocket service error types
-pub struct WebSocketError {
-    pub ConnectionClosed,
-    pub InvalidMessage(String),
-    pub SerializationError(String),
-    pub RepositoryError(String),
-    pub NotFound(String),
-    pub AlreadyExists(String),
-    pub Internal(String),
+#[derive(Error, Debug)]
+pub enum WebSocketError {
+    #[error("Connection closed")]
+    ConnectionClosed,
+
+    #[error("Invalid message: {0}")]
+    InvalidMessage(String),
+
+    #[error("Serialization error: {0}")]
+    SerializationError(#[from] serde_json::Error),
+
+    #[error("Username already exists: {0}")]
+    UsernameExists(String),
+
+    #[error("Internal error: {0}")]
+    Internal(String),
 }
+
+pub type Result<T> = std::result::Result<T, WebSocketError>;
